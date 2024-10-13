@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import Quiz from "./Quiz";
 
 const xValuesForCustomize = [0, -45, 10, 23, -44, 4, -30, 50];
 
@@ -6,6 +7,9 @@ const MovingCookieConsentBanner = () => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [xValueIterator, setXValueIterator] = useState(0);
   const [hasMousedOver, setHasMousedOver] = useState(false);
+  const [customizeActive, setCustomizeActive] = useState(false);
+  const [isAcceptPopupVisible, setIsAcceptPopupVisible] = useState(false);
+  const [isQuizPopupVisible, setIsQuizPopupVisible] = useState(false);
 
   const handleMouseOver = () => {
     if (!hasMousedOver) setHasMousedOver(true);
@@ -17,6 +21,15 @@ const MovingCookieConsentBanner = () => {
 
     setXValueIterator((prev) => (prev + 1) % xValuesForCustomize.length);
     setPosition(newPosition);
+  };
+
+  const handleDisplayFirsPopup = () => {
+    setIsAcceptPopupVisible(true);
+  };
+
+  const handleCloseFirstPopup = () => {
+    setIsAcceptPopupVisible(false);
+    setCustomizeActive(true);
   };
 
   return (
@@ -73,21 +86,57 @@ const MovingCookieConsentBanner = () => {
         <div>
           <button
             onMouseEnter={handleMouseOver}
-            className="bg-transparent text-white/10 px-4 py-2"
+            className={`${
+              customizeActive
+                ? "bg-gradient-to-r from-green-200 via-green-300 to-green-400 text-black font-bold py-3 px-6 rounded-lg shadow-lg transform transition-all duration-500 ease-in-out hover:rotate-12 hover:scale-110 hover:skew-x-12 hover:bg-gradient-to-l"
+                : "bg-transparent text-white/10"
+            } px-4 py-2`}
             style={{
               position: "relative",
               top: position.top,
               left: `${position.left}%`,
               transition: "top 0.5s, left 0.5s",
+              cursor: customizeActive ? "pointer" : "not-allowed",
             }}
+            disabled={!customizeActive}
+            onClick={() => setIsQuizPopupVisible(true)}
           >
             Customize
           </button>
-          <button className="px-4 py-2 bg-facebook-green border border-black shadow-lg">
+          <button
+            className="px-4 py-2 bg-facebook-green border border-black shadow-lg"
+            onClick={handleDisplayFirsPopup}
+          >
             Accept
           </button>
         </div>
       </div>
+      {isAcceptPopupVisible && (
+        <>
+          <div className="opacity-80 fixed h-full w-full z-50 bg-black pointer-events-none" />
+          <div className=" fixed p-4 z-70 flex flex-col justify-between items-center w-3/5 h-2/5 rounded-xl bg-gradient-to-br from-pink-300 via-yellow-200 to-purple-300 animate-gradient-move">
+            <div className="text-center text-7xl">
+              <strong>Woah! hold on there buddy!</strong>
+            </div>
+            <p className="text-center px-50">
+              As per new legal requirements, we are now obligated to have you
+              complete a brief quiz about cookies before you can make a decision
+              regarding our cookie collection policy. This quiz ensures that you
+              have a basic understanding of how cookies work, what data they
+              collect, and how they may affect your browsing experience. Once
+              completed, you'll be able to make an informed choice on accepting
+              or managing your cookie preferences.
+            </p>
+            <button
+              onClick={handleCloseFirstPopup}
+              className="bg-red-500 w-50 text-yellow-200 font-extrabold py-4 px-8 rounded-full border-4 border-yellow-500 shadow-2xl hover:bg-pink-700 hover:rotate-180 hover:scale-125 hover:border-purple-600 hover:text-blue-400 transition-all duration-500 ease-linear animate-spin-slow animate-pulse"
+            >
+              Ugh, fine..
+            </button>
+          </div>
+        </>
+      )}
+      {isQuizPopupVisible && <Quiz />}
     </div>
   );
 };

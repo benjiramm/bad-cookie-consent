@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.ugliest-color-ever {
+  color: #ff00ff; /* This is the ugliest color ever */
+}
